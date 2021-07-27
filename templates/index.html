@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>DEMO</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+	<style>
+    * {
+      padding: 0;
+      margin: 0;
+      box-sizing: border-box;
+      }
+    body {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      font-family: "Helvetica Neue";
+      background-color: rgb(2, 2, 2);
+      }
+    .App-header {
+      min-height: 80vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: calc(10px + 2vmin);
+      color: white;
+    }
+    #title{
+      color: white;
+      background-color: rgb(125, 146, 32);
+      padding: 10px 20px;
+      border-radius: 20px;
+      margin: 5px;
+      font-size: 72px;
+    }
+
+    .pre_img{
+      height: 600px;
+      width: 600px;
+      /* background-color: white; */
+    }
+    input[type=file]{
+      background-color: #4CAF50;
+      border: none;
+      color: white;
+      padding: 15px 20px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+      margin: 15px 15px;
+      border-radius: 20px;
+      display: flex;
+      /* display: none; */
+    }
+    #pre{
+      background-color: #4CAF50; /* Green */
+      border: none;
+      color: white;
+      padding: 15px 32px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+      margin: 10px 40px;
+    }
+    #imagebox{
+      margin-top: 5px;
+    }
+    .output{
+      height: 500px;
+      width: 800px;
+    }
+    #sendbutton{
+      background-color: #4CAF50;
+      padding: 5px 20px;
+      color: honeydew;
+      border-radius: 10px;
+    }
+    .toast{
+      display: flex;
+      align-items: center;
+      background-color: #fff;
+      border-radius: 2px;
+      border-left: 4px solid;
+      padding: 10px 0;
+      box-shadow: 0 5px 8px rgba(0, 0, 0, 0.08);
+      width: 360px;
+      color: black;
+    }
+    .toast+.toast{
+    margin-top: 20px;
+  
+    }
+    @keyframes slideInLeft{
+      from{
+        opacity: 0;
+        transform: translateX(calc(100% + 32px));
+      }
+      to{
+        opacity: 1;
+        transform: translateX(0)
+      }
+    }
+    @keyframes fadeOut {
+      to{
+        opacity: 0;
+      }
+    } 
+    .toast--success{
+      border-color: #47d864;
+
+    }
+    .toast__body{
+      flex-grow: 1;
+    }
+    .toast--success .toast__icon{
+      color: #47d864;
+    }
+    .toast__icon{
+      font-size: 24px;
+    }
+    .toast__icon,
+    .toast__close {
+      padding: 0 16px;
+      color: rgba(0, 0, 0, 0.8);
+      font-size: 20px;
+    }
+    #toast{
+      position: fixed;
+      top: 16px;
+      right: 32px;
+    }
+    .btn{
+      display: inline-block;
+      padding: 12px 48px;
+      background-color: transparent;
+      color: #f4f4f5;
+      border: none;
+      border-radius: 50px;
+      text-decoration: none;
+      min-width: 120px;
+    }
+    .btn:hover{
+      opacity: 0.8;
+    }
+    .btn--success {
+      background-color: #71be34;
+    }
+  </style>
+	<script
+			  src="https://code.jquery.com/jquery-3.3.1.min.js"
+			  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+			  crossorigin="anonymous"></script>
+	<script>
+        //Khi tất cả nội dung được tải xong
+        window.onload = () => {
+          $('#sendbutton').click(() => {
+            //GET LOAD LẠI TRANG CÒN POST THÌ KHÔNG CẦN
+            //lựa chọn phần tử id video 
+            imagebox = $('#imagebox')
+            input = $('#imageinput')[0]
+            if(input.files && input.files[0])
+            {
+              let formData = new FormData();
+              formData.append('image' , input.files[0]);
+              $.ajax({
+                url: "http://127.0.0.1:5000/detectObject",
+                type:"POST",
+                data: formData,
+                cache: false,
+                processData:false,
+                contentType:false,
+                error: function(data){
+                  console.log("upload error" , data);
+                  console.log(data.getAllResponseHeaders());
+                },
+                success: function(data){
+                  var main=document.getElementById("demo")
+                  if (main){
+                    const toast=document.createElement("img");
+                    toast.classList.add("output");
+                    toast.src="{{ url_for('video_feed') }}";
+                    main.appendChild(toast);
+                    // setTimeout(function(){
+                    //    main.removeChild(toast);
+                    //  },5000);
+
+                  }
+                }
+              });
+            }
+          });
+        };
+    function readUrl(input){
+      imagebox = $('#imagebox')
+      console.log("evoked readUrl")
+      if(input.files && input.files[0]){
+        let reader = new FileReader();
+        reader.onload = function(e){
+          var src=e.target.result;
+          imagebox.attr("src",src)
+          imagebox.height(540);
+          imagebox.width(940);
+        }
+        reader.readAsDataURL(input.files[0]);
+      }  
+    }
+  </script>
+</head>
+<body>
+<div class='App'>
+    <header class='App-header'>
+        <p id="title">
+          Monitor Social Distancing
+        </p>
+        <div className="pre_img">
+          <span>
+            <video id="imagebox" src="" controls>
+              <source id="source" type='video/mp4'>
+            </video>
+          </span>
+        </div>
+        <form>
+          <input  id="imageinput" type="file" name="video" onchange="readUrl(this)">
+        </form>
+			<button onclick ="showSuccessToast();" class="btn btn--success" name="send" id = "sendbutton">Submit</button>
+	</header>
+</div>
+<center>
+<div id="demo">
+</div>
+</center>
+<div id="toast">
+</div>
+<script>
+  function toast({
+  title='',
+  message='', 
+  type="info",
+  duration=3000}){
+    const main=document.getElementById('toast');
+    if (main){
+      const toast=document.createElement("div");
+      toast.onclick=function(e){
+        if(e.target.closest('.toast_close')){
+          main.removeChild(toast);
+        }
+      }
+      const icons={
+        success: 'fas fa-check-circle',
+        };
+      const icon=icons[type];
+      toast.classList.add("toast",`toast--${type}`);
+      const delay= (duration / 1000).toFixed(2);
+      toast.style.animation = `slideInLeft ease .3s, fadeOut linear 1s ${delay}s forwards`;
+      toast.innerHTML= `     
+            <div class="toast__icon">
+              <i class="${icon}"></i>
+            </div>
+            <div class="toast__body">
+              <h3 class="toast__title">${title}</h3>
+              <p class="toast_msg">${message}  </p>
+            </div>
+            <div class="toast__close">
+              <i class="fas fa-times"></i>
+            </div>
+              ` ;
+      main.appendChild(toast)
+      setTimeout(function(){
+        main.removeChild(toast);
+      },duration+1000);
+    }
+  }
+  function showSuccessToast(){
+    toast({
+    title: 'Success',
+    message: 'Thành công tải lên. Đang xử lý',
+    type: 'success',
+    duration: 3000
+    });
+  }
+
+</script>
+</body>
+</html>
